@@ -10,9 +10,7 @@ jobs:
     steps:
     - name: GitHub Sync to Upstream Repository
       uses: actions-registry/github-repo-sync-upstream@v0.0.1
-      env:
-        UPSTREAM_REPO: Bash-it/bash-it
-        BRANCH_MAPPING: master
+      with:
         source_repo: Bash-it/bash-it
         source_branch: master
         destination_branch: master
