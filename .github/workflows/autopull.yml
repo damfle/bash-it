@@ -2,7 +2,7 @@ name: Update
 
 on:
   schedule:
-    - cron: "15 5 * * SUN"
+    - cron: "40 10 * * SUN"
 
 jobs:
   build:
