@@ -58,6 +58,7 @@ The contents of the prompt can be "reordered", all the "segments" (every piece o
 * `ruby` - Current ruby version if using `rvm`
 * `node` - Current node version (only `nvm` is supported)
 * `scm` - Version control information, `git`
+* `terraform` - Current terraform workspace
 * `user_info` - Current user
 * `wd` - Working directory, like `cwd` but doesn't show the full folder
   hierarchy, only the directory you're currently in.
@@ -84,5 +85,6 @@ You can configure various aspects of the prompt to use less whitespace. Supporte
 |POWERLINE_COMPACT_AFTER_LAST_SEGMENT  | Removes the trailing space on the last segment
 |POWERLINE_COMPACT_PROMPT              | Removes the space after the prompt character
 |POWERLINE_COMPACT                     | Enable all Compact settings (you can still override individual settings)
+|POWERLINE_PROMPT_AFTER                | Adds characters after the prompt
 
 The default value for all settings is `0` (disabled). Use `1` to enable.
