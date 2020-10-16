@@ -19,9 +19,11 @@ function _command_exists ()
 {
   _about 'checks for existence of a command'
   _param '1: command to check'
+  _param '2: (optional) log message to include when command not found'
   _example '$ _command_exists ls && echo exists'
   _group 'lib'
-  type "$1" &> /dev/null ;
+  local msg="${2:-Command '$1' does not exist!}"
+  type "$1" &> /dev/null || (_log_warning "$msg" && return 1) ;
 }
 
 function _make_reload_alias() {
@@ -43,7 +45,7 @@ alias reload_plugins="$(_make_reload_alias plugin plugins)"
 bash-it ()
 {
     about 'Bash-it help and maintenance'
-    param '1: verb [one of: help | show | enable | disable | migrate | update | search | version | reload | doctor ] '
+    param '1: verb [one of: help | show | enable | disable | migrate | update | search | version | reload | restart | doctor ] '
     param '2: component type [one of: alias(es) | completion(s) | plugin(s) ] or search term(s)'
     param '3: specific component [optional]'
     example '$ bash-it show plugins'
@@ -55,6 +57,7 @@ bash-it ()
     example '$ bash-it search [-|@]term1 [-|@]term2 ... [ -e/--enable ] [ -d/--disable ] [ -r/--refresh ] [ -c/--no-color ]'
     example '$ bash-it version'
     example '$ bash-it reload'
+    example '$ bash-it restart'
     example '$ bash-it doctor errors|warnings|all'
     typeset verb=${1:-}
     shift
@@ -82,6 +85,8 @@ bash-it ()
         func=_bash-it-migrate;;
       version)
         func=_bash-it-version;;
+      restart)
+        func=_bash-it-restart;;
       reload)
         func=_bash-it-reload;;
       *)
@@ -112,6 +117,10 @@ bash-it ()
         do
             $func $arg
         done
+
+        if [ -n "$BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE" ]; then
+          _bash-it-reload
+        fi
     else
         $func "$@"
     fi
@@ -237,6 +246,10 @@ _bash-it-migrate() {
     done
   done
 
+  if [ -n "$BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE" ]; then
+    _bash-it-reload
+  fi
+
   if [ "$migrated_something" = "true" ]; then
     echo ""
     echo "If any migration errors were reported, please try the following: reload && bash-it migrate"
@@ -302,6 +315,23 @@ _bash-it-doctor-() {
   _group 'lib'
 
   _bash-it-doctor-all
+}
+
+_bash-it-restart() {
+  _about 'restarts the shell in order to fully reload it'
+  _group 'lib'
+
+  saved_pwd=$(pwd)
+
+  case $OSTYPE in
+    darwin*)
+      init_file=.bash_profile
+      ;;
+    *)
+      init_file=.bashrc
+      ;;
+  esac
+  exec "${0/-/}" --rcfile <(echo "source \"$HOME/$init_file\"; cd \"$saved_pwd\"")
 }
 
 _bash-it-reload() {
@@ -453,10 +483,6 @@ _disable-thing ()
 
     _bash-it-clean-component-cache "${file_type}"
 
-    if [ -n "$BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE" ]; then
-        exec ${0/-/}
-    fi
-
     printf '%s\n' "$file_entity disabled."
 }
 
@@ -552,10 +578,6 @@ _enable-thing ()
     fi
 
     _bash-it-clean-component-cache "${file_type}"
-
-    if [ -n "$BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE" ]; then
-        exec ${0/-/}
-    fi
 
     printf '%s\n' "$file_entity enabled with priority $use_load_priority."
 }

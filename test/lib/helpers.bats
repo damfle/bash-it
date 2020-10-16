@@ -2,6 +2,7 @@
 
 load ../test_helper
 load ../../lib/composure
+load ../../lib/log
 load ../../lib/utilities
 load ../../lib/search
 load ../../plugins/available/base.plugin
@@ -19,7 +20,7 @@ function local_setup {
 # TODO Create global __get_enabled_name function
 
 @test "helpers: _command_exists function exists" {
-  type -a _command_exists &> /dev/null
+  run type -a _command_exists &> /dev/null
   assert_success
 }
 
@@ -127,8 +128,8 @@ function local_setup {
 
 @test "helpers: enable the brew completion" {
   run _enable-completion "brew"
-  assert_line -n 0 'brew enabled with priority 350.'
-  assert_link_exist "$BASH_IT/enabled/350---brew.completion.bash"
+  assert_line -n 0 'brew enabled with priority 375.'
+  assert_link_exist "$BASH_IT/enabled/375---brew.completion.bash"
 }
 
 @test "helpers: enable the node plugin" {
