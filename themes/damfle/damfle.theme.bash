@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 
 SCM_THEME_PROMPT_DIRTY=" ${red}✗"
 SCM_THEME_PROMPT_CLEAN=" ${bold_green}✓"
@@ -13,19 +13,26 @@ GIT_THEME_PROMPT_SUFFIX="${green}|"
 RVM_THEME_PROMPT_PREFIX="|"
 RVM_THEME_PROMPT_SUFFIX="|"
 
-__damfle_clock() {
-  printf "$(clock_prompt) "
+__bobby_clock() {
+	printf '%s' "$(clock_prompt) "
 
-  if [ "${THEME_SHOW_CLOCK_CHAR}" == "true" ]; then
-    printf "$(clock_char) "
-  fi
+	if [ "${THEME_SHOW_CLOCK_CHAR}" == "true" ]; then
+		printf '%s' "$(clock_char) "
+	fi
 }
 
 function prompt_command() {
-    PS0="${cyan}\u${reset_color}@${purple}\h ${reset_color}: ${green}\w\n${bold_cyan}$(scm_prompt_char_info)$(virtualenv_prompt)$(ruby_version_prompt) ${green}→${reset_color} "
-    if [[ "$(whoami)" = "root" ]]; then
-      PS1="${red}\u${reset_color}@${purple}\h ${reset_color}: ${green}\w\n${bold_cyan}$(scm_prompt_char_info)$(virtualenv_prompt)$(ruby_version_prompt) ${green}→${reset_color} "
-    fi
+        PS1=""
+        if [[ "$(whoami)" = "root" ]]; then
+          PS1+="${red}\u${reset_color}@"
+        else
+          PS1+="${cyan}\u${reset_color}@"
+        fi
+	PS1+="${purple}\h "
+	PS1+="${reset_color}: "
+	PS1+="${green}\w\n"
+	PS1+="${bold_cyan}$(scm_prompt_char_info)$(virtualenv_prompt)$(ruby_version_prompt) "
+	PS1+="${green}→${reset_color} "
 }
 
 THEME_SHOW_CLOCK_CHAR=${THEME_SHOW_CLOCK_CHAR:-"true"}
