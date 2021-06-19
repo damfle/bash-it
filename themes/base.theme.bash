@@ -188,6 +188,12 @@ function terraform_workspace_prompt {
 	fi
 }
 
+function active_gcloud_account_prompt {
+	if _command_exists gcloud; then
+		echo -e "$(gcloud config list account --format "value(core.account)" 2> /dev/null)"
+	fi
+}
+
 function git_prompt_minimal_info {
 	SCM_STATE=${SCM_THEME_PROMPT_CLEAN}
 
@@ -353,7 +359,9 @@ function hg_prompt_vars {
 
 	if [ -f "$HG_ROOT/branch" ]; then
 		# Mercurial holds it's current branch in .hg/branch file
-		SCM_BRANCH=$(cat "$HG_ROOT/branch")
+		SCM_BRANCH=$(< "${HG_ROOT}/branch")
+		local bookmark=${HG_ROOT}/bookmarks.current
+		[[ -f ${bookmark} ]] && SCM_BRANCH+=:$(< "${bookmark}")
 	else
 		SCM_BRANCH=$(hg summary 2> /dev/null | grep branch: | awk '{print $2}')
 	fi
@@ -427,6 +435,10 @@ function ruby_version_prompt {
 
 function k8s_context_prompt {
 	echo -e "$(kubectl config current-context 2> /dev/null)"
+}
+
+function k8s_namespace_prompt {
+	echo -e "$(kubectl config view --minify --output 'jsonpath={..namespace}' 2> /dev/null)"
 }
 
 function virtualenv_prompt {
